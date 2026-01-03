@@ -1,19 +1,18 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 
-interface AuthGuardProps {
-  children: ReactNode;
-}
-
-export default function AuthGuard({ children }: AuthGuardProps) {
+export default function AuthGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("session_token");
     if (!token) router.push("/");
+    else setLoading(false);
   }, [router]);
 
+  if (loading) return <p>Loading...</p>;
   return children;
 }

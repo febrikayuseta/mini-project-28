@@ -2,26 +2,32 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import api from "@/lib/reqres";
+import reqres from "@/lib/reqres";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const router = useRouter();
 
   const handleLogin = async () => {
     try {
-      const res = await api.post("/login", {
-        email,
-        password
-      });
+      await reqres.post(
+        "/api/app-users/login",
+        {
+          email,
+          project_id: process.env.NEXT_PUBLIC_PROJECT_ID,
+        },
+        {
+          headers: {
+            "x-api-key": process.env.NEXT_PUBLIC_PUBLIC_KEY!,
+          },
+        }
+      );
 
-      localStorage.setItem("token", res.data.token);
-      router.push("/users");
-    } catch (err: any) {
-  console.log(err.response?.data);
-  alert(err.response?.data?.error);
-}
+      router.push(`/verify?email=${email}`);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to send verification code");
+    }
   };
 
   return (
@@ -30,17 +36,11 @@ export default function LoginPage() {
 
       <input
         placeholder="Email"
+        value={email}
         onChange={e => setEmail(e.target.value)}
       />
 
-      <input
-        type="password"
-        placeholder="Password"
-        onChange={e => setPassword(e.target.value)}
-      />
-
-      <button onClick={handleLogin}>Login</button>
-      <p onClick={() => router.push("/register")}>Register</p>
+      <button onClick={handleLogin}>Send Code</button>
     </main>
   );
 }

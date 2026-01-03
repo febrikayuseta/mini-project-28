@@ -1,29 +1,57 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import api from "@/lib/reqres";
+import { useRouter } from "next/navigation";
+import reqres from "@/lib/reqres";
 import AuthGuard from "../../components/AuthGuard";
-import type { AxiosResponse } from "axios";
-import type { User } from "../page";
+interface User {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  avatar: string;
+}
 
-export default function UserDetailPage() {
-  const { id } = useParams();
-  const [user, setUser] = useState<User | null>(null);
+interface Me {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string | null;
+}
+
+export default function UsersPage() {
+  const [users, setUsers] = useState<User[]>([]);
+  const router = useRouter();
+
+  // MOCK fetch “me” info
+  const [me, setMe] = useState<Me | null>(null);
   useEffect(() => {
-    api.get(`/users/${id}`)
-      .then((res: AxiosResponse) => setUser(res.data.data));
-  }, [id]);
+    const email = localStorage.getItem("mock_email");
+    setMe({ email, id: 1, first_name: "John", last_name: "Doe" });
+  }, []);
 
-  if (!user) return <p>Loading...</p>;
+  useEffect(() => {
+    reqres
+      .get("/users")
+      .then((res) => setUsers(res.data.data))
+      .catch(console.error);
+  }, []);
 
   return (
     <AuthGuard>
-      <main>
-        <h1>User Detail</h1>
-        <img src={user.avatar} width={100} />
-        <p>{user.first_name} {user.last_name}</p>
-        <p>{user.email}</p>
+      <main style={{ padding: "2rem" }}>
+        <h1>User List</h1>
+        {me && <p>Logged in as: {me.first_name} {me.last_name} ({me.email})</p>}
+        {users.map((user) => (
+          <div
+            key={user.id}
+            onClick={() => router.push(`/users/${user.id}`)}
+            style={{ cursor: "pointer", margin: "1rem 0" }}
+          >
+            <p>{user.first_name} {user.last_name}</p>
+            <p>{user.email}</p>
+          </div>
+        ))}
       </main>
     </AuthGuard>
   );
