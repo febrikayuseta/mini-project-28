@@ -89,10 +89,6 @@ export default function UsersPage() {
 
     const data = await res.json();
 
-    // 🔴 OLD
-    // setRegisteredUsers(data.data ? [data.data] : []);
-
-    // ✅ NEW — get users from record response
     setRegisteredUsers(data?.data?.data?.records ?? []);
   } catch (err) {
     console.error(err);
