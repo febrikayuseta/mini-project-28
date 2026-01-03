@@ -4,29 +4,28 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/lib/reqres";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     try {
-      const res = await api.post("/login", {
+      const res = await api.post("/register", {
         email,
         password
       });
 
-      localStorage.setItem("token", res.data.token);
-      router.push("/users");
-    } catch (err: any) {
-  console.log(err.response?.data);
-  alert(err.response?.data?.error);
-}
+      alert("Register success. Token: " + res.data.token);
+      router.push("/");
+    } catch {
+      alert("Register failed");
+    }
   };
 
   return (
     <main>
-      <h1>Login</h1>
+      <h1>Register</h1>
 
       <input
         placeholder="Email"
@@ -39,8 +38,7 @@ export default function LoginPage() {
         onChange={e => setPassword(e.target.value)}
       />
 
-      <button onClick={handleLogin}>Login</button>
-      <p onClick={() => router.push("/register")}>Register</p>
+      <button onClick={handleRegister}>Register</button>
     </main>
   );
 }
