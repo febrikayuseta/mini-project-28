@@ -1,40 +1,52 @@
-# React ReqRes Authentication App
+what ReqRes is designed for now is using App Users + magic links rather than the legacy /api/login and /api/register demo routes.
 
-Aplikasi frontend berbasis React yang terhubung dengan API publik ReqRes untuk simulasi autentikasi user dan manajemen data user.
 
-## 🚀 Fitur Aplikasi
-- Register user
-- Login user
-- Menampilkan daftar user
-- Menampilkan detail user
-- Simulasi autentikasi menggunakan token
+Create a Project + Collection
+In your project, create a collection called profiles (optional). This is where you can store extra user fields (name, avatar, etc).
+Login (magic link)
+From your frontend, call:
 
-## 🧪 API yang Digunakan
-- https://reqres.in/api/register
-- https://reqres.in/api/login
-- https://reqres.in/api/users
+POST https://reqres.in/api/app-users/login
 
-## 🔐 Catatan Autentikasi
-ReqRes merupakan mock API sehingga:
-- Login & register hanya mengembalikan token
-- Token tidak divalidasi pada endpoint lain
-- Autentikasi digunakan sebagai simulasi di sisi frontend
+Headers:
 
-## 🧑‍💻 Akun Testing
-### Login
-- Email: eve.holt@reqres.in
-- Password: cityslicka
+Content-Type: application/json
+x-api-key: YOUR_PUBLIC_KEY
 
-### Register
-- Email: eve.holt@reqres.in
-- Password: pistol
+Body:
 
-## 🛠️ Teknologi
-- React
-- Axios
-- React Router DOM
+{ “email”: “calvin@example.com”, “project_id”: YOUR_PROJECT_ID }
 
-## ▶️ Cara Menjalankan
-```bash
-npm install
-npm run dev
+
+
+ReqRes emails the user a one-time token (magic link).
+
+
+Verify token → get session token
+POST https://reqres.in/api/app-users/verify
+Body:
+{ “token”: “<magic_token>” }
+
+
+
+
+Response includes:
+
+session_token
+
+
+
+Use session token to get the current user
+GET https://reqres.in/api/app-users/me
+Headers:
+
+Authorization: Bearer <session_token>
+
+
+
+
+That gives you the “logged in user” you can show in your app.
+
+then check the registered user using what is stored in the records in profiles scoped to that user using the session token.
+
+
